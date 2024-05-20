@@ -39,7 +39,7 @@ def main():
                 wrapped_braille += '</div>'
                 st.write(f"<h4>Siz yozgan dastlabki matn:</h4><code>{text.capitalize()}</code>",unsafe_allow_html=True)
                 st.write(f"<h4>Tarjima matn: 👇</h4> {wrapped_braille}", unsafe_allow_html=True)
-                st.snow()
+                
 
         else:
             st.write("Brayl matndan oddiy matnga o'tkazish")
@@ -56,7 +56,7 @@ def main():
                 wrapped_braille += '</div>'
                 st.write(f"<h4>Siz yozgan dastlabki matn:</h4><code>{text.capitalize()}</code>",unsafe_allow_html=True)
                 st.write(f"<h4>Tarjima matn: 👇</h4> {wrapped_braille}", unsafe_allow_html=True)
-                st.snow()
+                
 
     except Exception as e:
         st.error(f"Xatolik paydo bo'ldi: {e}")

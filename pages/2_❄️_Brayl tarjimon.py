@@ -8,38 +8,41 @@ import tempfile
 import time
 import decimal
 
+with open('src//style.css') as f:
+    st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+    
 from arrange_boxes import convert_to_braille_unicode, parse_xywh_and_class
 from find_rotate import detect_and_rotate
 
 # UI elements
-st.markdown("<h1 style='text-align: center;'>Brayl tarjimon</h1>", unsafe_allow_html=True)
-st.markdown("<h3 style='text-align: center; color: grey;'>1-darajali Brayl alifbosini aniqlash dasturi</h3>", unsafe_allow_html=True)
+st.markdown("<h1>Brayl tarjimon</h1>", unsafe_allow_html=True)
+st.markdown("<h3>1-darajali Brayl alifbosini aniqlash dasturi</h3>", unsafe_allow_html=True)
 st.text("")
 
-with st.expander("Natijalarni sozlash uchun meni bosing!"):
+with st.expander("Natijalarni sozlash uchun meni bosing!", icon='⛈'):
     confidence = st.slider("Aniqlik", 0.1, 1.0, 0.6) 
     overlap_threshold = st.slider("O'xshashlik", 0.1, 1.0, 0.25)
 burish = st.checkbox("Tasvirni to'g'rilash")
 
-st.markdown("<p style='text-align: center;'><code>Eslatma: Faqat so'z va iboralarni qayta ishlash bilan cheklangan.</code></p>", unsafe_allow_html=True)
+st.markdown("<p><code>Eslatma: Faqat so'z va iboralarni qayta ishlash bilan cheklangan.</code></p>", unsafe_allow_html=True)
 upload_image = st.file_uploader(":camera: Rasmni tanlang", type=["png", "jpg", "jpeg"], label_visibility='hidden')
 
 @st.cache_resource()
 def load_model():
     try:
-        model = YOLO("models/yolov8_braille.pt")
+        model = YOLO("models//yolov8_braille.pt")
         model.overrides["conf"] = confidence 
         model.overrides["iou"] = overlap_threshold
         return model
     except Exception:
-        st.error("Model yuklanmadi. Brauzerni yangilang.")
+        st.error("Model yuklanmadi. Brauzerni yangilang.",icon="🚨")
         return None
 
 def load_image(upload):
     try:
         # Agar yuklangan fayl bo'lmasa, xatolik chiqaramiz
         if upload is None:
-            st.error("Tasvir yuklanmadi. Iltimos, fayl yuklang.")
+            st.error("Tasvir yuklanmadi. Iltimos, fayl yuklang.",icon="🚨")
             return None
 
         # Agar fayl yuklangan bo'lsa, uni BytesIO formatiga o'girib ochamiz
@@ -48,13 +51,13 @@ def load_image(upload):
         if burish:
             rotated_image = detect_and_rotate(image)
             if rotated_image is None:
-                st.error("Tasvirni qayta ishlashda muammo yuz berdi.")
+                st.error("Tasvirni qayta ishlashda muammo yuz berdi.",icon="🚨")
                 return None
             return rotated_image.convert("RGB")
         else:
             return image.convert("RGB")
     except Exception as e:
-        st.error(f"Tasvirni yuklashda xato: {str(e)}")
+        st.error(f"Tasvirni yuklashda xato: {str(e)}",icon="🚨")
         return None
 
 
@@ -76,10 +79,15 @@ def get_percentage(confidences):
 model = load_model()
 
 col2, col3 = st.columns(2)
-
+with st.sidebar:
+    st.image('src//image.png', width=150)
+    st.markdown("<p style='font-weight: bold; color: rgba(25,25,225, 0.8);'>👁 O'zbekcha Brayl tarjimon</p>",unsafe_allow_html=True)
+    
+    st.divider()
+    st.link_button("Men bilan bog'lanish",'https://t.me/shohabbosdev',type='secondary', icon="💻", use_container_width=True)
 # Load and display the image
 with col2:
-    image = load_image(upload_image) if upload_image else load_image("src/sample_image.jpg")
+    image = load_image(upload_image) if upload_image else load_image("src//Braille.jpg")
     col2.write("Asl rasm")
     col2.image(image)
 
@@ -87,7 +95,7 @@ with col3:
     with st.spinner('Algoritm ishlamoqda...'):
         start_timer = time.time()
         try:
-            file_path = tempfile.mktemp(suffix=".jpg") if upload_image else 'src/sample_image.jpg'
+            file_path = tempfile.mktemp(suffix=".jpg") if upload_image else 'src//Braille.jpg'
             if upload_image:
                 with open(file_path, "wb") as img_file:
                     img_file.write(upload_image.getbuffer())
@@ -110,4 +118,4 @@ with col3:
             create_download_button(Image.fromarray(res_plotted))
             st.success(f'Muvaffaqiyatli bajarildi! \nIshlash vaqti {time.time() - start_timer:.2f} sekund.', icon="✅")
         except Exception:
-            st.error("Qayta urining. Brayl belgilarining ko‘rinishini tekshiring yoki pastdagi slayder yordamida aniqlashni sozlang.")
+            st.error("Qayta urining. Brayl belgilarining ko‘rinishini tekshiring yoki pastdagi slayder yordamida aniqlashni sozlang.",icon="🚨")

@@ -3,7 +3,7 @@ import numpy as np
 import torch
 
 
-def convert_to_braille_unicode(str_input: str, path: str = "models/braille_maps.json") -> str:
+def convert_to_braille_unicode(str_input: str, path: str = "models//braille_maps.json") -> str:
     with open(path, "r", encoding='utf-8') as fl:
         data = json.load(fl)
 

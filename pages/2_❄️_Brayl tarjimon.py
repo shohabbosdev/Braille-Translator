@@ -6,18 +6,13 @@ import numpy as np
 import io
 import tempfile
 import time
-import decimal
-
-with open('src//style.css') as f:
-    st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
     
 from arrange_boxes import convert_to_braille_unicode, parse_xywh_and_class
 from find_rotate import detect_and_rotate
 
 # UI elements
-st.markdown("<h1>Brayl tarjimon</h1>", unsafe_allow_html=True)
-st.markdown("<h3>1-darajali Brayl alifbosini aniqlash dasturi</h3>", unsafe_allow_html=True)
-st.text("")
+st.markdown("<h1 style='text-align:center;'>❄️ Brayl tarjimon</h1>", unsafe_allow_html=True)
+st.markdown("<h4 style='text-align:center; color: orange;'>1-darajali Brayl alifbosini aniqlash dasturi</h4>", unsafe_allow_html=True)
 
 with st.expander("Natijalarni sozlash uchun meni bosing!", icon='⛈'):
     confidence = st.slider("Aniqlik", 0.1, 1.0, 0.6) 
@@ -30,7 +25,7 @@ upload_image = st.file_uploader(":camera: Rasmni tanlang", type=["png", "jpg", "
 @st.cache_resource()
 def load_model():
     try:
-        model = YOLO("models//yolov8_braille.pt")
+        model = YOLO("models/yolov8_braille.pt")
         model.overrides["conf"] = confidence 
         model.overrides["iou"] = overlap_threshold
         return model
@@ -40,12 +35,10 @@ def load_model():
 
 def load_image(upload):
     try:
-        # Agar yuklangan fayl bo'lmasa, xatolik chiqaramiz
         if upload is None:
             st.error("Tasvir yuklanmadi. Iltimos, fayl yuklang.",icon="🚨")
             return None
 
-        # Agar fayl yuklangan bo'lsa, uni BytesIO formatiga o'girib ochamiz
         image = Image.open(upload)
         
         if burish:
@@ -60,8 +53,6 @@ def load_image(upload):
         st.error(f"Tasvirni yuklashda xato: {str(e)}",icon="🚨")
         return None
 
-
-
 def create_download_button(image):
     buf = io.BytesIO()
     image.save(buf, format="JPEG")
@@ -74,48 +65,46 @@ def create_download_button(image):
 
 def get_percentage(confidences):
     mean = np.mean(confidences)
-    return decimal.Decimal(mean * 100).quantize(decimal.Decimal('0.00'))
+    return f"{mean * 100:.2f}"
 
 model = load_model()
 
 col2, col3 = st.columns(2)
 with st.sidebar:
-    st.image('src//image.png', width=150)
+    st.image('src/image.png', width=150)
     st.markdown("<p style='font-weight: bold; color: rgba(25,25,225, 0.8);'>👁 O'zbekcha Brayl tarjimon</p>",unsafe_allow_html=True)
     
     st.divider()
     st.link_button("Men bilan bog'lanish",'https://t.me/shohabbosdev',type='secondary', icon="💻", use_container_width=True)
-# Load and display the image
-with col2:
-    image = load_image(upload_image) if upload_image else load_image("src//Braille.jpg")
-    col2.write("Asl rasm")
-    col2.image(image)
 
-with col3:
-    with st.spinner('Algoritm ishlamoqda...'):
-        start_timer = time.time()
-        try:
-            file_path = tempfile.mktemp(suffix=".jpg") if upload_image else 'src//Braille.jpg'
-            if upload_image:
-                with open(file_path, "wb") as img_file:
-                    img_file.write(upload_image.getbuffer())
+image = load_image(upload_image) if upload_image else load_image("src/Braille.jpg")
+col2.write("Asl rasm")
+col2.image(image)
 
-            predict = model.predict(file_path, exist_ok=True)
-            res_plotted = predict[0].plot()[:, :, ::-1]
-            col3.write("Algoritmi natijasi: ")
-            col3.image(res_plotted)
+with st.spinner('Algoritm ishlamoqda...'):
+    start_timer = time.time()
+    try:
+        file_path = tempfile.mktemp(suffix=".jpg") if upload_image else 'src/Braille.jpg'
+        if upload_image:
+            with open(file_path, "wb") as img_file:
+                img_file.write(upload_image.getbuffer())
 
-            boxes = predict[0].boxes
-            confidences = boxes.conf.numpy()
-            percent = get_percentage(confidences)
-            list_boxes = parse_xywh_and_class(boxes)
+        predict = model.predict(file_path, exist_ok=True)
+        res_plotted = predict[0].plot()[:, :, ::-1]
+        col3.write("Segmentlangan tasvir: ")
+        col3.image(res_plotted)
 
-            for box_line in list_boxes:
-                str_left_to_right = "".join(convert_to_braille_unicode(model.names[int(each_class)]) for each_class in box_line[:, -1])
-                st.write(f"<code>{str_left_to_right}</code>",unsafe_allow_html=True)
+        boxes = predict[0].boxes
+        confidences = boxes.conf.numpy()
+        percent = get_percentage(confidences)
+        list_boxes = parse_xywh_and_class(boxes)
 
-            st.write(f"Aniqlik: {percent}%")
-            create_download_button(Image.fromarray(res_plotted))
-            st.success(f'Muvaffaqiyatli bajarildi! \nIshlash vaqti {time.time() - start_timer:.2f} sekund.', icon="✅")
-        except Exception:
-            st.error("Qayta urining. Brayl belgilarining ko‘rinishini tekshiring yoki pastdagi slayder yordamida aniqlashni sozlang.",icon="🚨")
+        for box_line in list_boxes:
+            str_left_to_right = "".join(convert_to_braille_unicode(model.names[int(each_class)]) for each_class in box_line[:, -1])
+            st.write(f"<code>{str_left_to_right}</code>",unsafe_allow_html=True)
+
+        st.write(f"Aniqlik: <span style='color: blue;'>{percent}%<span>",unsafe_allow_html=True)
+        create_download_button(Image.fromarray(res_plotted))
+        st.success(f'Muvaffaqiyatli bajarildi! \nIshlash vaqti {time.time() - start_timer:.2f} sekund.', icon="✅")
+    except Exception as e:
+        st.error(f"Xatolik xabari:\n {e}",icon="🚨")

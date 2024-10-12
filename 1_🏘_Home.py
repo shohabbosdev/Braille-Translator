@@ -16,23 +16,23 @@ st.set_page_config(
      layout="wide",
      initial_sidebar_state="expanded"
      )
-with open('src//style.css') as f:
-    st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+# with open('src\style.css') as f:
+#     st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
-st.markdown("<h1>Brayl alifbosidan foydalanib yozishni o'rganamiz</h1>", unsafe_allow_html=True)
+st.markdown("<h1 style='text-align:center;'>✍️ Brayl alifbosidan foydalanib yozishni o'rganamiz</h1>", unsafe_allow_html=True)
 st.caption("O'zbekcha Brayl alifbosidan foydalanib matnlar bilan ishlash ko'nikmangizni oshiring")
 
 def main():
     try:
         with st.sidebar:
-            st.image('src//image.png', width=150)
+            st.image('src/image.png', width=150)
             st.markdown("<p>👁 O'zbekcha Brayl tarjimon</p>",unsafe_allow_html=True)
             st.divider()
             tanlov = st.radio("Tarjima turini tanlang", options=("Matndan Braylga", "Brayldan matnga"))
             st.link_button(" Men bilan bog'lanish",'https://t.me/shohabbosdev',type='secondary', icon="💻",use_container_width=True)
 
         with st.expander("Brayl alifbosini ko'rish ⬇️"):
-            st.image('src//alifbo.png', caption="Brayl alifbosi")
+            st.image('src/alifbo.png', caption="Brayl alifbosi")
 
         if tanlov == "Matndan Braylga":
             st.write("Matndan Brayl yozuviga o'tkazish")

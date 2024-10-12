@@ -3,14 +3,14 @@ import numpy as np
 import torch
 
 
-def convert_to_braille_unicode(str_input: str, path: str = "models//braille_maps.json") -> str:
+def convert_to_braille_unicode(str_input: str, path: str = "models/braille_maps.json") -> str:
     with open(path, "r", encoding='utf-8') as fl:
         data = json.load(fl)
 
     if str_input in data.keys():
         str_output = data[str_input]
 
-        print(str_output)
+        print(f"Brayldan unicodega konvertatsiya natijasi: {str_output}")
     return str_output
 
 

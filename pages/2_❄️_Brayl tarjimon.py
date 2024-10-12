@@ -6,13 +6,20 @@ import numpy as np
 import io
 import tempfile
 import time
-    
-from arrange_boxes import convert_to_braille_unicode, parse_xywh_and_class
+import json
+import numpy as np
+import torch
 from find_rotate import detect_and_rotate
 
 # UI elements
 st.markdown("<h1 style='text-align:center;'>❄️ Brayl tarjimon</h1>", unsafe_allow_html=True)
 st.markdown("<h4 style='text-align:center; color: orange;'>1-darajali Brayl alifbosini aniqlash dasturi</h4>", unsafe_allow_html=True)
+
+maps_path = {
+    "O'zbekcha":"models/braille_maps.json",
+     "Ruscha":"models/russian_maps.json",
+     "Inglizcha": "models/english_maps.json",
+     }
 
 with st.expander("Natijalarni sozlash uchun meni bosing!", icon='⛈'):
     confidence = st.slider("Aniqlik", 0.1, 1.0, 0.6) 
@@ -20,6 +27,9 @@ with st.expander("Natijalarni sozlash uchun meni bosing!", icon='⛈'):
 burish = st.checkbox("Tasvirni to'g'rilash")
 
 st.markdown("<p><code>Eslatma: Faqat so'z va iboralarni qayta ishlash bilan cheklangan.</code></p>", unsafe_allow_html=True)
+
+select_language = st.selectbox("Lug'atni tanlang", options=maps_path, placeholder="Select language")
+
 upload_image = st.file_uploader(":camera: Rasmni tanlang", type=["png", "jpg", "jpeg"], label_visibility='hidden')
 
 @st.cache_resource()
@@ -76,6 +86,46 @@ with st.sidebar:
     
     st.divider()
     st.link_button("Men bilan bog'lanish",'https://t.me/shohabbosdev',type='secondary', icon="💻", use_container_width=True)
+
+
+select_language = maps_path["O'zbekcha"] if select_language=="O'zbekcha"else maps_path["Inglizcha"] if select_language=="Inglizcha" else maps_path["Ruscha"]
+
+def convert_to_braille_unicode(str_input: str, path: str = select_language) -> str:
+    with open(path, "r", encoding='utf-8') as fl:
+        data = json.load(fl)
+
+    if str_input in data.keys():
+        str_output = data[str_input]
+
+        print(f"Brayldan unicodega konvertatsiya natijasi: {str_output}")
+    return str_output
+
+
+def parse_xywh_and_class(boxes: torch.Tensor) -> list:
+
+    # copy values from troublesome "boxes" object to numpy array
+    new_boxes = np.zeros(boxes.shape)
+    new_boxes[:, :4] = boxes.xywh.numpy()  # first 4 channels are xywh
+    new_boxes[:, 4] = boxes.conf.numpy()  # 5th channel is confidence
+    new_boxes[:, 5] = boxes.cls.numpy()  # 6th channel is class which is last channel
+
+    # sort according to y coordinate
+    new_boxes = new_boxes[new_boxes[:, 1].argsort()]
+
+    # find threshold index to break the line
+    y_threshold = np.mean(new_boxes[:, 3]) // 2
+    boxes_diff = np.diff(new_boxes[:, 1])
+    threshold_index = np.where(boxes_diff > y_threshold)[0]
+
+    # cluster according to threshold_index
+    boxes_clustered = np.split(new_boxes, threshold_index + 1)
+    boxes_return = []
+    for cluster in boxes_clustered:
+        # sort according to x coordinate
+        cluster = cluster[cluster[:, 0].argsort()]
+        boxes_return.append(cluster)
+
+    return boxes_return
 
 image = load_image(upload_image) if upload_image else load_image("src/Braille.jpg")
 col2.write("Asl rasm")

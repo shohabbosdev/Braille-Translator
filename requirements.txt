@@ -3,3 +3,8 @@ ultralytics
 opencv-python
 scipy
 transformers
+pydub
+scipy
+audioread
+requests
+tqdm

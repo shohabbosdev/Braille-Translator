@@ -20,15 +20,15 @@ maps_path = {
      "Ruscha":"models/russian_maps.json",
      "Inglizcha": "models/english_maps.json",
      }
-
-with st.expander("Natijalarni sozlash uchun meni bosing!", icon='⛈'):
+st.markdown("<p><code>Eslatma: Faqat so'z va iboralarni qayta ishlash bilan cheklangan.</code></p>", unsafe_allow_html=True)
+qator1, qator2, qator3 = st.columns([1,2,3])
+with qator3.expander("Natijalarni sozlash uchun meni bosing!", icon='⛈'):
     confidence = st.slider("Aniqlik", 0.1, 1.0, 0.6) 
     overlap_threshold = st.slider("O'xshashlik", 0.1, 1.0, 0.25)
-burish = st.checkbox("Tasvirni to'g'rilash")
+burish = qator1.checkbox("Tasvirni to'g'rilash")
 
-st.markdown("<p><code>Eslatma: Faqat so'z va iboralarni qayta ishlash bilan cheklangan.</code></p>", unsafe_allow_html=True)
 
-select_language = st.selectbox("Lug'atni tanlang", options=maps_path, placeholder="Select language")
+select_language = qator2.selectbox("Lug'atni tanlang", options=maps_path, placeholder="Select language")
 
 upload_image = st.file_uploader(":camera: Rasmni tanlang", type=["png", "jpg", "jpeg"], label_visibility='hidden')
 

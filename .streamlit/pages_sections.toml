@@ -1,0 +1,24 @@
+[[pages]]
+path = "src/menus/home.py"
+name = "Home"
+icon = "🏠"
+
+[[pages]]
+path = "src/menus/tarjima.py"
+name = "Brayl tarjimon"
+icon = "❄️"
+
+[[pages]]
+path = "src/menus/tekshirgich.py"
+name = "Tekshirgich"
+icon = "✅"
+
+[[pages]]
+path = "src/menus/generatsiya.py"
+name = "Nutqqa generatsiya"
+icon = "📕"
+
+[[pages]]
+path = "src/menus/pydantic.py"
+name = "Sozlamalar"
+icon = "🔧"

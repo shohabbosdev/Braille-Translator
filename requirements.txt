@@ -8,3 +8,7 @@ scipy
 audioread
 requests
 tqdm
+st-annotated-text
+tensorflow
+tf-keras
+streamlit_option_menu

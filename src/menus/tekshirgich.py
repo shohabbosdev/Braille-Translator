@@ -32,7 +32,6 @@ def app():
         if tugma:
             # Matnni to'ldirish  
             results = unmasker(matn)  
-
             # Natijalarni chiqarish  
             st.markdown("<h3 style='text-align: center; text-decoration: underline;'>Maskni To'ldirish Dasturi</h3>",unsafe_allow_html=True)  
             # st.write("Quyidagi matndagi <mask> ni to'ldirish natijalari:")  
@@ -41,9 +40,9 @@ def app():
         else:          
             st.write("## 2. Matematik model")
             st.write("Brayl belgisini tanib olish masalasini quyidagicha modellashtirish mumkin:")
-            st.latex("B = \{b_1, b_2, ..., b_6\}")
+            st.latex("B = {b_1, b_2, ..., b_6}")
             st.write("- har bir Brayl belgisidagi 6 ta nuqtaning holati (0 yoki 1)")
-            st.latex("C = \{c_1, c_2, ..., c_n\}")
+            st.latex("C = {c_1, c_2, ..., c_n}")
             st.write("- mumkin bo'lgan Brayl belgilari to'plami")
             st.latex(r"f : B\rightarrow  C")
             st.write("- klassifikatsiya funksiyasi")

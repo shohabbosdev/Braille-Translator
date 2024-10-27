@@ -37,7 +37,7 @@ def app():
                 st.markdown("Brayl yozuviga o'tkazadigan matnni kiriting 👋")
                 text = st.text_input("Ma'lumot yozishni boshlang?")
 
-            if text is None:
+            if text:
                 st.info("Maydon bo'sh bo'lmasligiga e'tibor bering", icon='🥺')
             else:
                 braille_text = convertor.convert_chars_to_braille(text)

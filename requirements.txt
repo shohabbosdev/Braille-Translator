@@ -12,3 +12,4 @@ st-annotated-text
 tensorflow
 tf-keras
 streamlit_option_menu
+aiohttp

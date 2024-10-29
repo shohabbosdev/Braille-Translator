@@ -31,15 +31,14 @@ def app():
         with st.expander("Brayl alifbosini ko'rish ⬇️"):
             st.image('src/alifbo.png', caption="Brayl alifbosi")
         
+        # Har ikki bo‘limda `text` o'zgaruvchisini alohida aniqlash
         if tanlov == "Matndan Braylga":
             st.write("Matndan Brayl yozuviga o'tkazish")
             with st.popover("Matn kiritish uchun ushbu tugmani bosing"):
                 st.markdown("Brayl yozuviga o'tkazadigan matnni kiriting 👋")
-                text = st.text_input("Ma'lumot yozishni boshlang?")
+                text = st.text_input("Ma'lumot yozishni boshlang?", key="matn_to_braille")
 
-            if text:
-                st.info("Maydon bo'sh bo'lmasligiga e'tibor bering", icon='🥺')
-            else:
+            if text:  # Faqat text mavjud bo'lganda bajariladi
                 braille_text = convertor.convert_chars_to_braille(text)
                 wrapped_braille = '<div>'
                 for i in range(0, len(braille_text), 80): 
@@ -54,34 +53,32 @@ def app():
             st.write("Brayl matndan oddiy matnga o'tkazish")
             with st.popover("Matn kiritish uchun ushbu tugmani bosing"):
                 st.markdown("⠨⠃⠗⠁⠯⠇⠀⠍⠁⠞⠝⠊⠝⠊⠀⠅⠊⠗⠊⠞⠊⠝⠛⠲⠲⠲👋")
-                text = st.text_input("Ma'lumot yozishni boshlang?")
-            if text is None:
-                st.info("Maydon bo'sh bo'lmasligiga e'tibor bering", icon='🥺')
-            else:
-                sample_text  = convertor.convert_braille_to_chars(text)
+                text = st.text_input("Ma'lumot yozishni boshlang?", key="braille_to_text")
+            
+            if text:  # Bu shart `Brayldan matnga` uchun ishlaydi
+                sample_text = convertor.convert_braille_to_chars(text)
                 wrapped_braille = '<div style="width: 100%; word-wrap: break-word;">'
                 for i in range(0, len(sample_text), 80):  
-                    line = sample_text [i:i+80]
+                    line = sample_text[i:i+80]
                     colored_line = ''.join([f'<span style="color: #0fad47; font-size: 20pt">{char}</span>' if char != ' ' else char for char in line])
                     wrapped_braille += colored_line + '<br>'
                 wrapped_braille += '</div>'
                 st.write(f"<h4>Siz yozgan Brayl matn:</h4><code>{text.capitalize()}</code>", unsafe_allow_html=True)
                 
-                st.write(f"<code>{annotated_text(
-                        "Bu ",
-                        ("bo‘ladi", "fe'l"),
-                        " bir oz ",
-                        ("belgilangan", "sifat"),
-                        ("matn", "ot"),
-                        " sizlardan ",
-                        ("kim", "olmosh"),
-                        " bu kabi narsalarni ",
-                        ("yoqtiradi", "fe'l"),
-                        "."
+                st.write(f"""<code>{annotated_text(
+                        'Bu ',
+                        ('bo‘ladi', 'fe\'l'),
+                        ' bir oz ',
+                        ('belgilangan', 'sifat'),
+                        ('matn', 'ot'),
+                        ' sizlardan ',
+                        ('kim', 'olmosh'),
+                        ' bu kabi narsalarni ',
+                        ('yoqtiradi', 'fe\'l'),
+                        '.'
                     )
-                }</code>", unsafe_allow_html=True)
+                }</code>""", unsafe_allow_html=True)
                         
                 st.write(f"<h4>Tarjima matn: 👇</h4> {wrapped_braille}", unsafe_allow_html=True)
 
-    # if __name__ == '__main__':
     hisoblash()

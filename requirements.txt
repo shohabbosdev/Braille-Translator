@@ -13,3 +13,4 @@ tensorflow
 tf-keras
 streamlit_option_menu
 aiohttp
+streamlit-elements==0.1.*

@@ -15,10 +15,10 @@ st.markdown("<h4 style='text-align:center; color: orange;'>1-darajali Brayl alif
 @st.cache_resource
 def load_model():
     return YOLO("models/yolov8_braille.pt")
-
+ 
 @st.cache_data
 def load_braille_map():
-    with open("src/braille_maps.json", "r", encoding="utf-8") as fl:
+    with open("models/braille_maps.json", "r", encoding="utf-8") as fl:
         return json.load(fl)
 
 model = load_model()

@@ -65,3 +65,24 @@
 # plt.title(f"Lagrang ko'phadi: \n\n{langranj(x,X,Y)['kuphad']}\nX={x} bo'lganda yechim: {langranj(x,X,Y)['summa']}")
 # plt.plot(X,Y,color='red')
 # plt.show() 
+
+import requests
+import time
+import streamlit as st
+
+# Hugging Face token
+
+st.markdown("# :link: :rainbow[STT (Speech to Text)]")
+def query(audio_bytes):
+    headers = {"Authorization": f"Bearer {st.secrets['HUG_TOKEN']}"}
+    response = requests.post(st.secrets['STTAPI_URL'], headers=headers, data=audio_bytes)
+    return response.json()
+
+audio_file = st.file_uploader('Audio yuklang (wav yoki ogg formatda)', type=['ogg', 'wav'])
+if audio_file is not None:
+    audio_bytes = audio_file.read()
+    with st.status("Audiodan matnlar aniqlanayabdi..."):
+        output = query(audio_bytes)
+        time.sleep(2)
+        st.write("Aniqlangan matn:")
+        st.markdown(f"## :link: :rainbow[{output['text']}]")

@@ -1,6 +1,7 @@
 import streamlit as st
 import asyncio
 import aiohttp
+import time
 from latin_cyrillic_symbols import to_cyrillic
 
 # API tokeni va URL'ni himoyalangan holda olish
@@ -139,6 +140,8 @@ def app():
             
             if audio_content:
                 st.success("✅ Matn muvaffaqiyatli tovushga aylandi!")
+                st.toast('Ajoyib!', icon='🎉')
+                time.sleep(.5)
                 st.audio(audio_content, format='audio/wav', autoplay=True)
             else:
                 st.warning("⚠️ Server bilan muammo yuz berdi. Qayta urinib ko'ring.")

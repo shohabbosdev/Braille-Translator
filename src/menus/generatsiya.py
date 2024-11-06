@@ -1,30 +1,27 @@
 import streamlit as st
-import requests
 import asyncio
 import aiohttp
 from latin_cyrillic_symbols import to_cyrillic
 
-
-# API tokeni va URL’ni himoyalangan holatda olish
+# API tokeni va URL'ni himoyalangan holda olish
 api_key = st.secrets["API_TOKEN"]
 API_URL = st.secrets["API_URL"]
 
-# Braille klaviatura tugmalari uchun CSS uslublar
-def get_button_style(color="red", hover_color="red", active_color="aqua"):
+# CSS uslublarni qaytaruvchi funksiyalar
+def get_button_style(color="black", hover_color="#ff6f61", active_color="#4CAF50"):
     return f"""
     <style>
         .braille-button {{
             color: {color};
-            border-radius: 10px;
-            font-size: 1em;  /* Keeps font size consistent */
-            border: 1px solid green;
+            border-radius: 15px;
+            font-size: 1.1em;
+            border: 1px solid #4CAF50;
             background-color: transparent;
-            padding: 10px 15px;
+            padding: 12px 16px;
             cursor: pointer;
-            margin: 5px;
+            margin: 4px;
             transition: background-color 0.3s ease, color 0.3s ease;
-            flex: 0 1 calc(25% - 10px); /* Allowing 4 buttons per row */
-            box-sizing: border-box; /* Ensures padding is included in width */
+            text-align: center;
         }}
         .braille-button:hover {{
             background-color: {hover_color};
@@ -35,109 +32,121 @@ def get_button_style(color="red", hover_color="red", active_color="aqua"):
             color: white;
         }}
 
-        /* Responsive and mobile styles */
-        .braille-buttons-container {{
+        /* "Bo'sh joy" va "Tozalash" tugmalari uchun dizayn */
+        .control-buttons {{
             display: flex;
-            flex-wrap: wrap;
-            justify-content: flex-start; /* Align buttons to the left */
-            gap: 5px;
-            max-width: 640px; /* Set a max width for the container */
-            margin: 0 auto; /* Center the container */
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
         }}
-        @media (max-width: 600px) {{
-            .braille-button {{
-                font-size: 0.9em;
-                padding: 8px 12px;
-                flex: 0 1 calc(50% - 10px); /* Allowing 2 buttons per row on small screens */
-            }}
+        .control-button {{
+            color: white;
+            background-color: #007BFF;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.3s ease;
+        }}
+        .control-button:hover {{
+            background-color: #0056b3;
         }}
     </style>
     """
 
-
-# Braille harf va raqamlarni yaratish
-def create_braille_alphabet():
-    return {
-        'a': '⠁', 'b': '⠃', 'd': '⠙', 'e': '⠑',
-        'f': '⠋', 'g': '⠛', 'h': '⠓', 'i': '⠊',
-        'j': '⠚', 'k': '⠅', 'l': '⠇', 'm': '⠍',
-        'n': '⠝', 'o': '⠕', 'p': '⠏', 'q': '⠽',
-        'r': '⠗', 's': '⠎', 't': '⠞', 'u': '⠥',
-        'v': '⠺', 'x': '⠹', 'y': '⠯', 'z': '⠵',
-        'ch': '⠟', 'sh': '⠱', "o'": '⠧', "g'": '⠻'
+# Braille belgilarini yaratish
+def create_braille_symbols(symbol_type="alphabet"):
+    symbols = {
+        'alphabet': {
+            'a': '⠁', 'b': '⠃', 'c': '⠉', 'd': '⠙', 'e': '⠑',
+            'f': '⠋', 'g': '⠛', 'h': '⠓', 'i': '⠊', 'j': '⠚',
+            'k': '⠅', 'l': '⠇', 'm': '⠍', 'n': '⠝', 'o': '⠕',
+            'p': '⠏', 'q': '⠟', 'r': '⠗', 's': '⠎', 't': '⠞',
+            'u': '⠥', 'v': '⠧', 'w': '⠺', 'x': '⠭', 'y': '⠽',
+            'z': '⠵', 'ch': '⠟', 'sh': '⠱', "o'": '⠧', "g'": '⠻'
+        },
+        'numbers': {
+            '0': '⠚', '1': '⠁', '2': '⠃', '3': '⠉', '4': '⠙',
+            '5': '⠑', '6': '⠋', '7': '⠛', '8': '⠓', '9': '⠊'
+        }
     }
+    return symbols[symbol_type]
 
-def create_braille_numbers():
-    return {
-        '0': '⠚', '1': '⠁', '2': '⠃', '3': '⠉', '4': '⠙',
-        '5': '⠑', '6': '⠋', '7': '⠛', '8': '⠓', '9': '⠊'
-    }
+# Matnni tovushga aylantirish funksiyasi
+async def text_to_speech(text, language="uz"):
+    try:
+        text = text if any('\u0400' <= char <= '\u04FF' for char in text) else to_cyrillic(text)
+        
+        headers = {"Authorization": f"Bearer {api_key}"}
+        payload = {"inputs": text}
+        async with aiohttp.ClientSession() as session:
+            async with session.post(API_URL, headers=headers, json=payload) as response:
+                if response.status == 200:
+                    return await response.read()
+    except Exception as e:
+        st.error(f"❌ Xatolik: {e}")
+        return None
 
+# Braille interfeysining asosiy qismi
 def app():
-    # Braille matnini kiritish uchun sessiya holatini o'rnatish
-    if 'result' not in st.session_state:
-        st.session_state.result = ""
-
-    # Matnni tovushga aylantirish funksiyasi
-    async def text_to_speech(text, language="uz"):
-        try:
-            # Matnni Kirill alifbosiga o‘tkazish
-            text = text if any('\u0400' <= char <= '\u04FF' for char in text) else to_cyrillic(text)
-            
-            # API so‘rovi
-            headers = {"Authorization": f"Bearer {api_key}"}
-            payload = {"inputs": text}
-            async with aiohttp.ClientSession() as session:
-                async with session.post(API_URL, headers=headers, json=payload) as response:
-                    if response.status == 200:
-                        return response.status, text, await response.read()
-                    return response.status, text, None
-        except Exception as e:
-            st.error(f"❌ Matnni tovushga aylantirishda xatolik yuz berdi: {e}")
-            return None, None, None
-
-    # CSS uslublarni qo'shish
     st.markdown(get_button_style(), unsafe_allow_html=True)
+    st.markdown("# ✅ :rainbow[Brayl klaviaturasi]")
 
-    # Braille klaviaturasini yaratish
-    st.markdown("<h2 style='text-align:center; color:red;'>Brayl harflari</h2>", unsafe_allow_html=True)
-    alphabet = create_braille_alphabet()
-    cols = st.columns(6)
+    # Braille harflarini ko'rsatish
+    st.markdown("## 🔑 :red[Brayl Harflari]")
+    alphabet = create_braille_symbols("alphabet")
+    ustunlar_soni = [5,6]
+    # Harflarni 5 ustunli qatorlarda ko'rsatish va `help` orqali ko'rsatish
+    cols = st.columns(ustunlar_soni[1])
     for i, (letter, symbol) in enumerate(alphabet.items()):
-        with cols[i % 6]:
-            if st.button(symbol, key=f"btn_{letter}", help=letter):
-                st.session_state.result += letter
+        col = cols[i % ustunlar_soni[1]]  # Har bir qator uchun 5 ta ustun
+        with col:
+            st.button(symbol, key=f"btn_{letter}", help=f"{letter}", on_click=lambda l=letter: st.session_state.update(result=st.session_state.result + l))
 
-    st.markdown("<h2 style='text-align:center; color:#116466;'>Brayl raqamlari</h2>", unsafe_allow_html=True)
-    numbers = create_braille_numbers()
-    num_cols = st.columns(5)
+    # Braille raqamlarini ko'rsatish
+    st.markdown("## 📌 :green[Brayl Raqamlari]")
+    numbers = create_braille_symbols("numbers")
+    
+    with st.sidebar:
+        st.divider()
+        st.image('src/image.png', width=150)
+        st.markdown("👁 :rainbow[O'zbekcha Brayl tarjimon]")
+    # Raqamlarni 5 ustunli qatorlarda ko'rsatish va `help` orqali ko'rsatish
+    num_cols = st.columns(ustunlar_soni[0])
     for i, (number, symbol) in enumerate(numbers.items()):
-        with num_cols[i % 5]:
-            if st.button(symbol, key=f"num_btn_{number}", help=number):
-                st.session_state.result += number
+        col = num_cols[i % ustunlar_soni[0]]
+        with col:
+            st.button(symbol, key=f"num_btn_{number}", help=f"{number}", on_click=lambda n=number: st.session_state.update(result=st.session_state.result + n))
 
-    # "Bo'sh joy" va "Tozalash" tugmalari
-    if st.button("Bo'sh joy", key="space_button", use_container_width=True, type='primary', icon='👉'):
-        st.session_state.result += " "
-    if st.button("Tozalash", key="clear_button", use_container_width=True, type='secondary', icon='🆑'):
-        st.session_state.result = ""
+    # "Bo'sh joy" va "Tozalash" tugmalari uchun maxsus qator
+    st.markdown("<div class='control-buttons'>", unsafe_allow_html=True)
+    row1,row2=st.columns(2)
+    with row1:
+        if st.button("Bo'sh joy", key="space_button", use_container_width=True, type='primary', icon='🗳'):
+            st.session_state.result += " "
+    with row2:
+        if st.button("Tozalash", key="clear_button", use_container_width=True, type='primary', icon='🖇'):
+            st.session_state.result = ""
+    st.markdown("</div>", unsafe_allow_html=True)
 
-    # Natijani ko'rsatish
+    # Matn maydoni va tovushga aylantirish tugmasi
     st.text_area("💬 Matn kiriting yoki yuqoridagi Brayl klaviaturasidan foydalaning", value=st.session_state.result, key="result", height=100)
 
-    # Tovushga aylantirish tugmasi
     if st.button("🎧 Tovushga aylantirish", disabled=not st.session_state.result.strip()):
         with st.spinner("Jarayon boshlandi. Iltimos, kuting..."):
-            loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(loop)
-            status_code, processed_text, audio_content = loop.run_until_complete(text_to_speech(st.session_state.result, "uz"))
-            loop.close()
+            audio_content = asyncio.run(text_to_speech(st.session_state.result, "uz"))
             
-            if status_code == 200 and audio_content:
+            if audio_content:
                 st.success("✅ Matn muvaffaqiyatli tovushga aylandi!")
                 st.audio(audio_content, format='audio/wav', autoplay=True)
             else:
                 st.warning("⚠️ Server bilan muammo yuz berdi. Qayta urinib ko'ring.")
 
+# Session state uchun boshlang‘ich qiymatni o‘rnatish
+if 'result' not in st.session_state:
+    st.session_state.result = ""
+
+# Dastur funksiyasini chaqirish
 if __name__ == '__main__':
     app()

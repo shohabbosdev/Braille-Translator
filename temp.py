@@ -42,26 +42,26 @@
 # # Grafiklarni ko'rsatish
 # plt.show()
 
-import numpy as np
-from scipy.interpolate import lagrange
-import matplotlib.pyplot as plt
+# import numpy as np
+# from scipy.interpolate import lagrange
+# import matplotlib.pyplot as plt
 
-X = np.array([5, 7, 13, 15, 10, 3])
-Y = np.array([0, 5, 10, 15, 20, 24])
+# X = np.array([5, 7, 13, 15, 10, 3])
+# Y = np.array([0, 5, 10, 15, 20, 24])
 
-x=12
-def langranj(item, array1,array2):
-    poly = lagrange(array1,array2)
-    sum=0
-    for i in range(len(array1)-1,-1,-1):
-        sum+=poly[i]*item**i
-    return {
-        "summa":sum,
-        "kuphad":poly
-    }
+# x=12
+# def langranj(item, array1,array2):
+#     poly = lagrange(array1,array2)
+#     sum=0
+#     for i in range(len(array1)-1,-1,-1):
+#         sum+=poly[i]*item**i
+#     return {
+#         "summa":sum,
+#         "kuphad":poly
+#     }
 
-plt.xlabel("X data")
-plt.ylabel("Y data")
-plt.title(f"Lagrang ko'phadi: \n\n{langranj(x,X,Y)['kuphad']}\nX={x} bo'lganda yechim: {langranj(x,X,Y)['summa']}")
-plt.plot(X,Y,color='red')
-plt.show() 
+# plt.xlabel("X data")
+# plt.ylabel("Y data")
+# plt.title(f"Lagrang ko'phadi: \n\n{langranj(x,X,Y)['kuphad']}\nX={x} bo'lganda yechim: {langranj(x,X,Y)['summa']}")
+# plt.plot(X,Y,color='red')
+# plt.show() 

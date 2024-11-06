@@ -9,9 +9,6 @@ from scipy import ndimage
 import tempfile
 import time
 
-st.markdown("<h1 style='text-align:center;'>❄️ Brayl tarjimon</h1>", unsafe_allow_html=True)
-st.markdown("<h4 style='text-align:center; color: orange;'>1-darajali Brayl alifbosini aniqlash dasturi</h4>", unsafe_allow_html=True)
-
 @st.cache_resource
 def load_model():
     return YOLO("models/yolov8_braille.pt")
@@ -85,11 +82,16 @@ def parse_xywh_and_class(boxes):
     return boxes_return
 
 def app():
+    st.markdown("# ✅ :rainbow[Rasmli brayl yozuvini oddiy o'zbekcha alifboga o'tkazish]", unsafe_allow_html=True)
+
     with st.sidebar:
         with st.expander("Natijalarni sozlash uchun meni bosing!", icon='⛈'):
             confidence = st.slider("Aniqlik", 0.1, 1.0, 0.6)
             overlap_threshold = st.slider("O'xshashlik", 0.1, 1.0, 0.25)
         burish = st.checkbox("Tasvirni to'g'rilash")
+        st.divider()
+        st.image('src/image.png', width=150)
+        st.markdown("👁 :rainbow[O'zbekcha Brayl tarjimon]")
 
     upload_image = st.file_uploader(":camera: Rasmni tanlang", type=["png", "jpg", "jpeg"], label_visibility='hidden')
     qator1, qator2 = st.columns(2)

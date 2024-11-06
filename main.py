@@ -9,7 +9,6 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 from src.menus import tekshirgich, generatsiya, home, tarjima
-
 class Multiapp:
     def __init__(self):
         self.apps = []

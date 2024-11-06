@@ -1,10 +1,6 @@
 import streamlit as st
 from streamlit_elements import nivo, mui, elements
 from transformers import pipeline
-
-# Logotip joylashtirish
-st.sidebar.image("src/logo.jpg", caption="shohabbosdev", width=150)
-
 # Modelni yuklash va kechlashtirish
 @st.cache_resource
 def load_model():
@@ -13,46 +9,48 @@ def load_model():
 unmasker = load_model()
 
 def display_header():
-    st.markdown("<h1 style='text-align: center;'>✅ Matnlar tekshirgichi</h1>", unsafe_allow_html=True)
+    st.markdown("# ✅ :rainbow[Matnlar tekshirgichi]")
 
 def process_text(matn, masklangan_soz):
     return matn.replace(masklangan_soz, "<mask>")
 
 def truncate_text(text, length=10):
-    # Matnni belgilangan uzunlikka qisqartirish
     return text if len(text) <= length else text[:length] + "..."
 
 def display_results(masklangan_matn):
-    results = unmasker(masklangan_matn)
-    st.markdown("<h3 style='text-align: center;'>Natijalar</h3>", unsafe_allow_html=True)
-    
-    data = []  # Aniqlangan so'z va foiz qiymatlarni saqlash uchun ro'yxat
-    
-    for result in results:
-        token_str = result['token_str']
-        aniqlik = result['score'] * 100
-        data.append({
-            "id": truncate_text(token_str),  # Legendda qisqartirilgan matn
-            "value": round(aniqlik, 2),
-            "label": f"{truncate_text(token_str)}: {aniqlik:.2f}%"  # Legendda foiz formati bilan ko'rsatish
-        })
-    
-        # Rangli natijalarni ko'rsatish
-        rangli_natija = masklangan_matn.replace(
-            "<mask>", f"<span style='color: #ff5733; font-weight: bold;'>{token_str}</span>"
-        )
+    with st.spinner("Natijalar yuklanmoqda..."):
+        results = unmasker(masklangan_matn)
         
-        # Natija va aniqlikni ko'rsatish
-        st.markdown(f"💬 {rangli_natija}", unsafe_allow_html=True)
-        st.metric("Aniqlik", f"{aniqlik:.2f}%")
+        st.markdown("<h3 style='text-align: center;'>Natijalar</h3>", unsafe_allow_html=True)
+        data = []
+        for result in results:
+            token_str = result['token_str']
+            aniqlik = result['score'] * 100
+            data.append({
+                "id": truncate_text(token_str),
+                "value": round(aniqlik, 2),
+                "label": f"{truncate_text(token_str)}: {aniqlik:.2f}%"
+            })
 
-    # Nivo grafikni ko'rsatish
-    show_nivo_chart(data)
-    
+            rangli_natija = masklangan_matn.replace(
+                "<mask>", f"<span style='color: #ff5733; font-weight: bold;'>{token_str}</span>"
+            )
+            
+            # Natijani individual kartochka sifatida ko'rsatish
+            st.markdown(f"""
+            <div style="border-radius: 10px; padding: 10px; background-color: #f0f0f0; margin-bottom: 10px;">
+                <h4 style="color: #333;">💬 {rangli_natija}</h4>
+                <p><strong>Aniqlik:</strong> {aniqlik:.2f}%</p>
+            </div>
+            """, unsafe_allow_html=True)
+
+        # Nivo grafikni ko'rsatish
+        show_nivo_chart(data)
+
 def show_nivo_chart(data):
     with elements("nivo_charts"):  
         with mui.Box(sx={"height": 500, "width": 700}):  
-            nivo.Pie(  
+            nivo.Pie(
                 data=data,  
                 width=800,  
                 height=500,  
@@ -60,6 +58,8 @@ def show_nivo_chart(data):
                 innerRadius=0.5,
                 pixelRatio=4,
                 padAngle=0.7,
+                colors={"scheme":'paired'},
+                sortByValue=True,
                 cornerRadius=3,
                 activeOuterRadiusOffset=8,
                 borderWidth=1,
@@ -68,27 +68,10 @@ def show_nivo_chart(data):
                 arcLinkLabelsThickness=2,
                 arcLabelsSkipAngle=10,
                 motionConfig="wobbly",
-                arcLabelsTextColor=[{
-                    "from": 'color',
-                    "modifiers": [["darker", 2]]
-                }],
-                borderColor=[{
-                    "from": 'color',
-                    "modifiers": [["darker", 0.2]]
-                }],
-                defs=[  
-                    {  
-                        "id": 'dots',  
-                        "type": 'patternDots',  
-                        "background": 'inherit',  
-                        "color": 'rgba(255, 255, 255, 0.4)',  
-                        "size": 4,  
-                        "padding": 1,  
-                        "stagger": True  
-                    }  
-                ],
-                legends=[
-                    {
+                arcLabelsTextColor=[{"from": 'color',"modifiers": [["darker", 2]]}],
+                borderColor=[{"from": 'color',"modifiers": [["darker", 0.2]]}],
+                defs=[{ "id": 'dots', "type": 'patternDots', "background": 'inherit',"color": 'rgba(255, 255, 255, 0.4)', "size": 4, "padding": 1,"stagger": True }],
+                legends=[ {
                         "anchor": 'right',  
                         "direction": 'column',  
                         "justify": False,
@@ -102,14 +85,7 @@ def show_nivo_chart(data):
                         "itemOpacity": 1,
                         "symbolSize": 18,
                         "symbolShape": 'circle',
-                        "effects": [
-                            {
-                                "on": 'hover',
-                                "style": {
-                                    "itemTextColor": '#000'
-                                }
-                            }
-                        ]
+                        "effects": [ { "on": 'hover', "style": {"itemTextColor": '#000'}}]
                     }
                 ],
                 fill=[{ "match": { "id": 'react' }, "id": 'dots' }],
@@ -118,18 +94,10 @@ def show_nivo_chart(data):
 
 def app():
     display_header()
-
-    # Foydalanuvchi kiritgan matn
     default_text = "Egiluvchan bo‘g‘inlari va yarim bukilgan tirnoqlari tik qiyaliklar hamda daraxtlarga oson chiqish imkonini beradi."
     matn = st.text_area("Matn kiriting", value=default_text, placeholder="Matnni kiriting...")
+    masklangan_soz = st.selectbox("Mask qilmoqchi bo'lgan so'zni tanlang", matn.split())
 
-    # Matnni so'zlar bo'yicha ajratish
-    sozlar = matn.split()
-    
-    # So'zlar orasidan tanlash uchun selectbox
-    masklangan_soz = st.selectbox("Mask qilmoqchi bo'lgan so'zni tanlang", sozlar)
-
-    # Natijalarni chiqarish formasi
     with st.form("text_form"):
         bajarish = st.form_submit_button("Bajarish")
         if bajarish:
@@ -138,10 +106,10 @@ def app():
                 display_results(masklangan_matn)
             else:
                 st.warning("Iltimos, matndan biror so'zni tanlang.")
-    
-    # Sidebarda qo'shimcha ma'lumotlar
-    st.sidebar.markdown("### 👁 O'zbekcha Brayl tarjimon")
-    st.sidebar.markdown("[ Men bilan bog'lanish ](https://t.me/shohabbosdev) 💻", unsafe_allow_html=True)
+    with st.sidebar:
+        st.divider()
+        st.image('src/image.png', width=150)
+        st.markdown("👁 :rainbow[O'zbekcha Brayl tarjimon]")
 
 if __name__ == "__main__":
     app()

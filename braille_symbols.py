@@ -14,7 +14,7 @@ class BrailleConverter:
         symbols = "⠂⠆⠒⠲⠢⠖⠴⠶⠶⠄⠤"
         specific = "⠨⠼⠸⠀"
 
-    def __init__(self, braille_map_path="src/braille_maps.json"):
+    def __init__(self, braille_map_path="models/braille_maps.json"):
         with open(braille_map_path, "r") as f:
             self.braille_map = json.load(f)
 

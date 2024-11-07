@@ -13,10 +13,24 @@ def app():
     [Luis Brayl](https://www.labarandilla.org/wp-content/uploads/2018/01/luis-braille.jpg) tomonidan yaratilgan. 
     Brayl shrifti asosida :red[6] nuqtani turli vaziyatda uygʻunlashtirish yotadi.
     ''')
+    @st.dialog("Ro'yxatdan o'tish")
+    def email_form(lastname,firstname,email):
+        lastname=st.text_input("Familiyangizni kiriting", placeholder="Ulug'murodov")
+        firstname=st.text_input("Ismingizni kiriting", placeholder="Shoh Abbos")
+        email=st.text_input("Elektron pochtangizni kiriting", placeholder='shohabbosdev@gmail.com')
+        if st.button("Saqlash", type='primary', icon='👌', use_container_width=True):
+            st.session_state.email_form = {"lastname":lastname, "firstname":firstname, "email":email}
+            st.rerun()
+    if "email_form" not in st.session_state:
+        st.write("Keling siz bilan tanishamiz")
+        if st.button("Tanishish", type='primary', icon="✅",use_container_width=True):
+            email_form("Alisherov","Dilmurod","alisher@gmail.com")
+    else:
+        st.markdown(f":mag_right: Sizning FISH: :rainbow[{st.session_state.email_form['lastname']} {st.session_state.email_form['firstname']}], :mailbox_closed: Elektron pochtangiz {st.session_state.email_form['email']}")
     st.caption("O'zbekcha Brayl alifbosidan foydalanib matnlar bilan ishlash ko'nikmangizni oshiring")
 
     def query(audio_bytes):
-        headers = {"Authorization": f"Bearer {st.secrets['HUG_TOKEN']}"}
+        headers = {"Authorization": f"Bearer {st.secrets['API_TOKEN']}"}
         response = requests.post(st.secrets['STTAPI_URL'], headers=headers, data=audio_bytes)
         return response.json()
 

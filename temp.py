@@ -74,7 +74,7 @@ import streamlit as st
 
 st.markdown("# :link: :rainbow[STT (Speech to Text)]")
 def query(audio_bytes):
-    headers = {"Authorization": f"Bearer {st.secrets['HUG_TOKEN']}"}
+    headers = {"Authorization": f"Bearer {st.secrets['API_TOKEN']}"}
     response = requests.post(st.secrets['STTAPI_URL'], headers=headers, data=audio_bytes)
     return response.json()
 

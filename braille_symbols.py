@@ -248,7 +248,7 @@ if __name__ == "__main__":
         print()
     
     test("Assalomu alaykum do'stlar, qalaysizlar meni nomerim 998941956231")
-    test("jo'ja g'isht shift ombor (ichidagi) odam")
+    test("jo'ja g'isht shift ombor (ichidagi) odam ng ng ng")
 
 """
 10240 ⠀   |10241 ⠁ a |10242 ⠂ , |10243 ⠃ b |

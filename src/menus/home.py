@@ -30,10 +30,13 @@ def app():
     st.caption("O'zbekcha Brayl alifbosidan foydalanib matnlar bilan ishlash ko'nikmangizni oshiring")
 
     def query(audio_bytes):
-        headers = {"Authorization": f"Bearer {st.secrets['API_TOKEN']}"}
-        response = requests.post(st.secrets['STTAPI_URL'], headers=headers, data=audio_bytes)
-        return response.json()
-
+        try:
+            headers = {"Authorization": f"Bearer {st.secrets['API_TOKEN']}"}
+            response = requests.post(st.secrets['STTAPI_URL'], headers=headers, data=audio_bytes)
+            return response.json()
+        except Exception as e:
+            st.error(f"Internetga ulanishda xatolik bor. Qurilmangiz internetga ulanganligini tekshiring")
+            return None
     def hisoblash():
         # Audio yuklash
         audio_file = st.sidebar.file_uploader('Audio yuklang (wav yoki ogg formatda)', type=['ogg', 'wav', 'mp3'], help="Audio faylni shu yerga olib keling")
@@ -47,13 +50,15 @@ def app():
                 output = query(audio_bytes)
                 time.sleep(2)
                 st.toast('Muvaffaqiyatli bajarildi!', icon='🎉')
-                output_text = output.get('text', '')
+                if output==None:
+                    st.toast("Internet ulanish xatolik bo'ldi", icon='🔎')
+                else:
+                    output_text = output.get('text', '')
 
         # Tarjima turini tanlash
         with st.sidebar:
             st.image('src/image.png', width=150)
             st.markdown("👁 :rainbow[O'zbekcha Brayl tarjimon]")
-            st.divider()
             tanlov = st.radio("Tarjima turini tanlang", options=("Matndan Braylga", "Brayldan matnga"))
             st.markdown('[shohabbosdev](https://github.com/shohabbosdev)')    
 

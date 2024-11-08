@@ -215,7 +215,7 @@ def detect_script(text):
         except ValueError:
             raise ValueError("Invalid")
 
-def clean_text(text):
+def clean_text_number(text):
     try:
         if text!='':
             text = replace_numbers(text)
@@ -230,4 +230,4 @@ def clean_text(text):
         return None 
 
 
-# print(clean_text("Assalomu alaykum 15 ga kelaman"))
+# print(clean_text_number("Assalomu alaykum 15 ga kelaman"))

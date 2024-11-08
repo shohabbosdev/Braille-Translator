@@ -107,7 +107,6 @@ def app():
             else:
                 st.warning("Iltimos, matndan biror so'zni tanlang.")
     with st.sidebar:
-        st.divider()
         st.image('src/image.png', width=150)
         st.markdown("👁 :rainbow[O'zbekcha Brayl tarjimon]")
 

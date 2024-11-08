@@ -66,23 +66,49 @@
 # plt.plot(X,Y,color='red')
 # plt.show() 
 
+# import requests
+# import time
+# import streamlit as st
+
+# # Hugging Face token
+
+# st.markdown("# :link: :rainbow[STT (Speech to Text)]")
+# def query(audio_bytes):
+#     headers = {"Authorization": f"Bearer {st.secrets['API_TOKEN']}"}
+#     response = requests.post(st.secrets['STTAPI_URL'], headers=headers, data=audio_bytes)
+#     return response.json()
+
+# audio_file = st.file_uploader('Audio yuklang (wav yoki ogg formatda)', type=['ogg', 'wav'])
+# if audio_file is not None:
+#     audio_bytes = audio_file.read()
+#     with st.status("Audiodan matnlar aniqlanayabdi..."):
+#         output = query(audio_bytes)
+#         time.sleep(2)
+#         st.write("Aniqlangan matn:")
+#         st.markdown(f"## :link: :rainbow[{output['text']}]")
+
 import requests
 import time
 import streamlit as st
 
-# Hugging Face token
-
 st.markdown("# :link: :rainbow[STT (Speech to Text)]")
-def query(audio_bytes):
-    headers = {"Authorization": f"Bearer {st.secrets['API_TOKEN']}"}
-    response = requests.post(st.secrets['STTAPI_URL'], headers=headers, data=audio_bytes)
-    return response.json()
+@st.cache_data()
+def query(file_data):
+    try:
+        headers = {"Authorization": f"Bearer {st.secrets['API_TOKEN']}"}
+        response = requests.post(st.secrets['API_URL_HAND'], headers=headers, data=file_data)
+        if response.status_code == 200:
+            return response.json()
+    except Exception as e:
+        st.warning(f"Xatolik bo'ldi: {e}")
+        return None
 
-audio_file = st.file_uploader('Audio yuklang (wav yoki ogg formatda)', type=['ogg', 'wav'])
-if audio_file is not None:
-    audio_bytes = audio_file.read()
-    with st.status("Audiodan matnlar aniqlanayabdi..."):
-        output = query(audio_bytes)
+photo_file = st.file_uploader('Rasm yuklang', type=['png','jpg'])
+if photo_file is not None:
+    photo_file_bytes = photo_file.read()
+    st.image(photo_file,caption="Yuklagan rasmingiz")
+    with st.status("Rasmdan matnlar aniqlanayabdi..."):
+        output = query(photo_file_bytes)
         time.sleep(2)
         st.write("Aniqlangan matn:")
-        st.markdown(f"## :link: :rainbow[{output['text']}]")
+        st.markdown(f"## :link: :rainbow[{output[0]['generated_text']}]")

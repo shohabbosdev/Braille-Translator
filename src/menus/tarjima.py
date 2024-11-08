@@ -89,7 +89,6 @@ def app():
             confidence = st.slider("Aniqlik", 0.1, 1.0, 0.6)
             overlap_threshold = st.slider("O'xshashlik", 0.1, 1.0, 0.25)
         burish = st.checkbox("Tasvirni to'g'rilash")
-        st.divider()
         st.image('src/image.png', width=150)
         st.markdown("👁 :rainbow[O'zbekcha Brayl tarjimon]")
 

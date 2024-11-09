@@ -8,7 +8,7 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="expanded"
 )
-from src.menus import tekshirgich, generatsiya, home, tarjima
+from src.menus import tekshirgich, generatsiya, home, tarjima, statistika
 class Multiapp:
     def __init__(self):
         self.apps = []
@@ -21,8 +21,8 @@ class Multiapp:
         with st.sidebar:
             app = option_menu(
                 menu_title="Brayl",
-                options=["Bosh sahifa","Brayl tarjimon","Matn tekshiruvi","Nutqqa generatsiya"],
-                icons=['house-up-fill','translate','check2-square','earbuds'],
+                options=["Bosh sahifa","Brayl tarjimon","Matn tekshiruvi","Nutqqa generatsiya", "Statistika"],
+                icons=['house-up-fill','translate','check2-square','earbuds', 'graph-up-arrow'],
                 menu_icon='gem',
                 default_index=1,
                 styles={
@@ -39,5 +39,7 @@ class Multiapp:
             tekshirgich.app()        
         if app == 'Nutqqa generatsiya':
             generatsiya.app() 
+        if app == "Statistika":
+            statistika.app() 
 
     run()

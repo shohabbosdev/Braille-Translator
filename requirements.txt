@@ -17,5 +17,4 @@ python-docx
 python-pptx
 PyMuPDF
 openpyxl
-firebase_admin
 pyrebase4

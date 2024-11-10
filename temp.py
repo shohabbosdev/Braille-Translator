@@ -114,81 +114,113 @@
 #         st.markdown(f"## :link: :rainbow[{output[0]['generated_text']}]")
 
 
-import streamlit as st
-import requests
-from random import randrange
-import time
+# import streamlit as st
+# import requests
+# from random import randrange
+# import time
 
-# Kategoriya ro'yxati
-category_lists = [
-    'happiness', 'age', 'alone', 'amazing', 'anger', 'architecture', 'art', 
-    'attitude', 'beauty', 'best', 'birthday', 'business', 'car', 'change', 
-    'communication', 'computers', 'cool', 'courage', 'dad', 'dating', 'death', 
-    'design', 'dreams', 'education', 'environmental', 'equality', 'experience', 
-    'failure', 'faith', 'family', 'famous', 'fear', 'fitness', 'food', 
-    'forgiveness', 'freedom', 'friendship', 'funny', 'future', 'god', 'good', 
-    'government', 'graduation', 'great', 'health', 'history', 'home', 'hope', 
-    'humor', 'imagination', 'inspirational', 'intelligence', 'jealousy', 
-    'knowledge', 'leadership', 'learning', 'legal', 'life', 'love', 'marriage', 
-    'medical', 'men', 'mom', 'money', 'morning', 'movies', 'success'
-]
+# # Kategoriya ro'yxati
+# category_lists = [
+#     'happiness', 'age', 'alone', 'amazing', 'anger', 'architecture', 'art', 
+#     'attitude', 'beauty', 'best', 'birthday', 'business', 'car', 'change', 
+#     'communication', 'computers', 'cool', 'courage', 'dad', 'dating', 'death', 
+#     'design', 'dreams', 'education', 'environmental', 'equality', 'experience', 
+#     'failure', 'faith', 'family', 'famous', 'fear', 'fitness', 'food', 
+#     'forgiveness', 'freedom', 'friendship', 'funny', 'future', 'god', 'good', 
+#     'government', 'graduation', 'great', 'health', 'history', 'home', 'hope', 
+#     'humor', 'imagination', 'inspirational', 'intelligence', 'jealousy', 
+#     'knowledge', 'leadership', 'learning', 'legal', 'life', 'love', 'marriage', 
+#     'medical', 'men', 'mom', 'money', 'morning', 'movies', 'success'
+# ]
 
-# Tasodifiy kategoriya tanlash
-category = category_lists[randrange(len(category_lists))]
+# # Tasodifiy kategoriya tanlash
+# category = category_lists[randrange(len(category_lists))]
 
-st.markdown("## :rainbow[Oraliqni hisoblash]")
-st.markdown("### :rainbow[{} qator oraliqini olish uchun API ga xabar berish]".format(category))
+# st.markdown("## :rainbow[Oraliqni hisoblash]")
+# st.markdown("### :rainbow[{} qator oraliqini olish uchun API ga xabar berish]".format(category))
 
-# Tanlangan kategoriyaga oid iqtibos olish funksiyasi
-def select_category(category):
-    api_url = f'{st.secrets['QUOTE_URL']}{category}'
-    response = requests.get(api_url, headers={'X-Api-Key': f"{st.secrets['OCR_QUOTE_API']}"})
-    if response.status_code == 200:
-        quote = response.json()[0]["quote"]
-        author = response.json()[0]["author"]
-        return [quote, author]
-    else:
-        st.error(f"Xatolik: {response.status_code}, {response.text}")
+# # Tanlangan kategoriyaga oid iqtibos olish funksiyasi
+# def select_category(category):
+#     api_url = f'{st.secrets['QUOTE_URL']}{category}'
+#     response = requests.get(api_url, headers={'X-Api-Key': f"{st.secrets['OCR_QUOTE_API']}"})
+#     if response.status_code == 200:
+#         quote = response.json()[0]["quote"]
+#         author = response.json()[0]["author"]
+#         return [quote, author]
+#     else:
+#         st.error(f"Xatolik: {response.status_code}, {response.text}")
 
-# Rasmni matnga aylantirish funksiyasi
-def image_to_text(image):
-    files = {'image': image}
-    headers = {'X-Api-Key': f"{st.secrets['OCR_QUOTE_API']}"}
-    try:
-        response = requests.post(st.secrets['OCR_URL'], headers=headers, files=files)
-        if response.status_code == 200:
-            text_results = response.json()
-            if text_results:
-                extracted_text = " ".join([item["text"] for item in text_results])
-                return extracted_text
-            else:
-                return "Hech qanday matn topilmadi."
-        else:
-            return f"Xatolik: {response.status_code}, {response.text}"
-    except Exception as e:
-        return f"Xatolik: {e}"
+# # Rasmni matnga aylantirish funksiyasi
+# def image_to_text(image):
+#     files = {'image': image}
+#     headers = {'X-Api-Key': f"{st.secrets['OCR_QUOTE_API']}"}
+#     try:
+#         response = requests.post(st.secrets['OCR_URL'], headers=headers, files=files)
+#         if response.status_code == 200:
+#             text_results = response.json()
+#             if text_results:
+#                 extracted_text = " ".join([item["text"] for item in text_results])
+#                 return extracted_text
+#             else:
+#                 return "Hech qanday matn topilmadi."
+#         else:
+#             return f"Xatolik: {response.status_code}, {response.text}"
+#     except Exception as e:
+#         return f"Xatolik: {e}"
 
-# Kategoriya bo'yicha iqtibos olish
+# # Kategoriya bo'yicha iqtibos olish
 
-st.markdown(f"> {select_category(category)[0]}\n\n*{select_category(category)[1]}*")
+# st.markdown(f"> {select_category(category)[0]}\n\n*{select_category(category)[1]}*")
 
-# Fayl yuklash
-uploaded_image = st.file_uploader("Rasmni yuklang...", type=['jpg', 'png'])
+# # Fayl yuklash
+# uploaded_image = st.file_uploader("Rasmni yuklang...", type=['jpg', 'png'])
 
-# Rasm yuklangan yoki yuklanmaganligini tekshirish va vaqtni hisoblash
-if uploaded_image:
-    row1, row2 = st.columns([2, 4])
-    row1.image(uploaded_image, caption="Dastlabki rasm")
+# # Rasm yuklangan yoki yuklanmaganligini tekshirish va vaqtni hisoblash
+# if uploaded_image:
+#     row1, row2 = st.columns([2, 4])
+#     row1.image(uploaded_image, caption="Dastlabki rasm")
 
-    # Matn ajratish vaqti
-    with st.spinner("Siz yuborgan tasvirdan matnlar ajratib olinayabdi. Iltimos, kuting..."):
-        start_time = time.time()
-        extracted_text = image_to_text(uploaded_image)
-        end_time = time.time()
-        elapsed_time = end_time - start_time
+#     # Matn ajratish vaqti
+#     with st.spinner("Siz yuborgan tasvirdan matnlar ajratib olinayabdi. Iltimos, kuting..."):
+#         start_time = time.time()
+#         extracted_text = image_to_text(uploaded_image)
+#         end_time = time.time()
+#         elapsed_time = end_time - start_time
 
-    # Natijani ko'rsatish
-    row2.text_area("Natija...", value=extracted_text, height=200)
-    st.write(f"Aniqlashga sarflangan vaqt: {elapsed_time:.2f} sekund")
-else:
-    st.write("Fayl yuklash tugmasini bosing")
+#     # Natijani ko'rsatish
+#     row2.text_area("Natija...", value=extracted_text, height=200)
+#     st.write(f"Aniqlashga sarflangan vaqt: {elapsed_time:.2f} sekund")
+# else:
+#     st.write("Fayl yuklash tugmasini bosing")
+
+# import streamlit as st
+# import requests
+
+# def facts():
+#     api_url = f'{st.secrets['FACTS_URL']}'
+#     response = requests.get(api_url, headers={'X-Api-Key': f"{st.secrets['OCR_QUOTE_API']}"})
+#     if response.status_code == requests.codes.ok:
+#         print(response.json()[0]['fact'])
+#     else:
+#         print("Error:", response.status_code, response.text)
+
+# # 389eebc7-4e87-4c59-b0c0-d1a1f1c0aacc
+# def tahrirchi(text):
+#     api_url = "https://websocket.tahrirchi.uz/translate"
+#     headers = {
+#         "api-key": "389eebc7-4e87-4c59-b0c0-d1a1f1c0aacc", # "Authorization" o'rniga "api-key" ishlatib ko'ring
+#         "Content-Type": "application/json"
+#     }
+#     data = {
+#         "text": {"texts": [text]},
+#         "source_lang": "eng_Latn",
+#         "target_lang": "uzn_Latn",
+#     }
+#     response = requests.post(api_url, json=data, headers=headers)
+#     if response.status_code == 200:
+#         print(response.json()['sentences'][-1]['translated'])
+#     else:
+#         print("Error:", response.status_code, response.text)
+
+# # tahrirchi(facts())
+# tahrirchi("Hi my name is Alijon")

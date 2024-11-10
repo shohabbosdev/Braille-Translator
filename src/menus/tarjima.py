@@ -100,8 +100,7 @@ def parse_xywh_and_class(boxes):
 
 # Tanlangan kategoriyaga oid iqtibos olish funksiyasi
 def select_category(category):
-    api_url = f'{st.secrets['QUOTE_URL']}{category}'
-    response = requests.get(api_url, headers={'X-Api-Key': f"{st.secrets['OCR_QUOTE_API']}"})
+    response = requests.get(f'{st.secrets['QUOTE_URL']}{category}', headers={'X-Api-Key': f"{st.secrets['OCR_QUOTE_API']}"})
     if response.status_code == 200:
         quote = response.json()[0]["quote"]
         author = response.json()[0]["author"]

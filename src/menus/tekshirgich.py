@@ -1,3 +1,4 @@
+import requests
 import streamlit as st
 from streamlit_elements import nivo, mui, elements
 from transformers import pipeline
@@ -93,10 +94,19 @@ def show_nivo_chart(data):
                 enableArcLinkLabels=False
             )
 
+def facts():
+    api_urls = f'{st.secrets['FACTS_URL']}'
+    response = requests.get(api_urls, headers={'X-Api-Key': f"{st.secrets['OCR_QUOTE_API']}"})
+    if response.status_code == requests.codes.ok:
+        return response.json()[0]['fact']
+    else:
+        st.error(f"Error: {response.status_code}, {response.text}")
+
 def app():
     display_header()
     default_text = "Egiluvchan bo‘g‘inlari va yarim bukilgan tirnoqlari tik qiyaliklar hamda daraxtlarga oson chiqish imkonini beradi."
     matn = st.text_area("Matn kiriting", value=default_text, placeholder="Matnni kiriting...")
+    st.markdown(f"> {facts()}")
     masklangan_soz = st.selectbox("Mask qilmoqchi bo'lgan so'zni tanlang", matn.split())
 
     with st.form("text_form"):

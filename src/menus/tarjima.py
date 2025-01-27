@@ -140,7 +140,7 @@ def app():
     # Tasodifiy kategoriya tanlash
     category = category_lists[randrange(len(category_lists))]
     # st.markdown(f"> :blue[{select_category(category)[0]}]")
-    st.html(f'<div align="right">📕 {select_category(category)[1]} </div>')
+    # st.html(f'<div align="right">📕 {select_category(category)[1]} </div>')
         
       
     brailleTab1, brailleTab2 = st.tabs(["1\. :orange[Brayldan tasviridan matnga o'tkazish]", "2\. :green[Lotincha rasmdan matnga o'tkazish]"])

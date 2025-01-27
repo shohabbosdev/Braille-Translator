@@ -139,7 +139,7 @@ def app():
 
     # Tasodifiy kategoriya tanlash
     category = category_lists[randrange(len(category_lists))]
-    st.markdown(f"> :blue[{select_category(category)[0]}]")
+    # st.markdown(f"> :blue[{select_category(category)[0]}]")
     st.html(f'<div align="right">📕 {select_category(category)[1]} </div>')
         
       

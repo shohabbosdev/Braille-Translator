@@ -10,6 +10,7 @@ from pptx import Presentation
 import pandas as pd
 import fitz
 import requests
+import urllib3
 
 api_key, API_URL, API_URL_HAND = st.secrets["API_TOKEN"], st.secrets["API_URL"],st.secrets["API_URL_HAND"]
 
@@ -77,6 +78,22 @@ def handwrite_jpg_to_text(file_data):
         st.warning(f"Xatolik bo'ldi: {e}")
         return None
 
+#Audioga o'tkazish
+def text_to_audio(text):    
+    try:  
+        headers = {"Content-Type": "application/json"}  
+        data = {"text": text}  
+        urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)  
+        
+        response = requests.post(st.secrets['OAPI_URL'], headers=headers, json=data, verify=False)  
+        
+        if response.status_code == 200:  
+            return response.content 
+        else:  
+            return None   
+    except Exception as ex:  
+        st.error(f"xatolik: {ex}")  
+        return None  
 async def text_to_speech(text, language="uz"):
     try:
         text = text if any('\u0400' <= char <= '\u04FF' for char in text) else to_cyrillic(text)
@@ -96,7 +113,8 @@ async def text_to_speech(text, language="uz"):
         return None
 
 async def main_text_to_speech():
-    audio_content = await text_to_speech(st.session_state.result, "uz")
+    audio_content = text_to_audio(st.session_state.result)
+    # audio_content = await text_to_speech(st.session_state.result, "uz")
     if audio_content:
         st.success("✅ Matn muvaffaqiyatli tovushga aylandi!")
         st.toast('Ajoyib!', icon='🎉')

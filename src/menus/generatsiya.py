@@ -85,7 +85,7 @@ def text_to_audio(text):
         data = {"text": text}  
         urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)  
         
-        response = requests.post(st.secrets['OAPI_URL'], headers=headers, json=data, verify=False)  
+        response = requests.post('https://oyqiz.airi.uz/api/v1/tts/', headers=headers, json=data, verify=False)  
         
         if response.status_code == 200:  
             return response.content 

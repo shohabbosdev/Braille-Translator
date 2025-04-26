@@ -4,7 +4,7 @@ from streamlit_elements import nivo, mui, elements
 from transformers import pipeline
 @st.cache_resource
 def load_model():
-    return pipeline('fill-mask', model='tahrirchi/tahrirchi-bert-small')
+    return pipeline('fill-mask', model='tahrirchi/tahrirchi-bert-base')
 
 unmasker = load_model()
 
